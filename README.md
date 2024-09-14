@@ -7,4 +7,6 @@ A simple PaperMC plugin that allows opening shulkers without placing them down. 
 
 Note that this does use experimental APIs, so it may not work on versions not explicitly supported.
 
+Written for Hardrada.
+
 If you find any issues, please open an issue.

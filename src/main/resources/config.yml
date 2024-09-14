@@ -1,0 +1,1 @@
+disable-in-combat: false # disallows opening shulkers in combat (as it can be quite powerful). requires CombatLogX.

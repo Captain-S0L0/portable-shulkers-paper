@@ -19,6 +19,11 @@ public class Listeners implements Listener {
         // handle opening
         if (event.getAction() == Action.RIGHT_CLICK_AIR & event.hasItem() && MaterialSetTag.SHULKER_BOXES.isTagged(event.getItem().getType())) {
 
+            if (!PortableShulkers.INSTANCE.canOpenGUI(event.getPlayer())) {
+                event.getPlayer().sendMessage("§4[§6PortableShulkers§4] §cError! You can't do that right now!");
+                return;
+            }
+
             // close the current inventory in case it's another shulker inventory (so the event item updates properly)
             event.getPlayer().closeInventory();
 

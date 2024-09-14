@@ -1,12 +1,15 @@
 package xyz.terriblefriends.portableshulkers;
 
 import com.destroystokyo.paper.MaterialSetTag;
+import com.github.sirblobman.combatlogx.api.ICombatLogX;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -23,6 +26,9 @@ public final class PortableShulkers extends JavaPlugin {
     public void onEnable() {
         INSTANCE = this;
         getServer().getPluginManager().registerEvents(new Listeners(), this);
+
+        saveResource("config.yml", false);
+        saveDefaultConfig();
 
         LifecycleEventManager<Plugin> manager = this.getLifecycleManager();
         manager.registerEventHandler(LifecycleEvents.COMMANDS, (event) -> {
@@ -54,6 +60,11 @@ public final class PortableShulkers extends JavaPlugin {
                                     return 0;
                                 }
 
+                                if (!this.canOpenGUI(player)) {
+                                    ctx.getSource().getSender().sendMessage("§4[§6PortableShulkers§4] §cError! You can't do that right now!");
+                                    return 0;
+                                }
+
                                 // close the current inventory in case it's another shulker inventory (so the event item updates properly)
                                 player.closeInventory();
 
@@ -65,11 +76,11 @@ public final class PortableShulkers extends JavaPlugin {
                     List.of()
             );
         });
-
     }
 
     @Override
     public void onDisable() {
+        // make sure to close all inventories before the listeners are unregistered
         this.closing = true;
         for (PortableShulkerInventoryHolder holder : this.openHolders) {
             holder.onClose();
@@ -85,5 +96,19 @@ public final class PortableShulkers extends JavaPlugin {
         if (!this.closing) {
             this.openHolders.remove(holder);
         }
+    }
+
+    public boolean canOpenGUI(Player player) {
+        if (PortableShulkers.INSTANCE.getConfig().getBoolean("disable-in-combat")) {
+            PluginManager pluginManager = Bukkit.getPluginManager();
+            if (pluginManager.isPluginEnabled("CombatLogX")) {
+                Plugin plugin = pluginManager.getPlugin("CombatLogX");
+                if (plugin instanceof ICombatLogX combatLogX) {
+                    return !combatLogX.getCombatManager().isInCombat(player);
+                }
+            }
+        }
+
+        return true;
     }
 }
