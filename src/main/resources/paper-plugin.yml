@@ -1,0 +1,4 @@
+name: portable-shulkers
+version: '${version}'
+main: xyz.terriblefriends.portableshulkers.PortableShulkers
+api-version: '1.20'
